@@ -12,7 +12,7 @@ st.markdown(
 # Input long text
 input_text = st.text_area("Input Original Text:", height=250)
 
-# Fungsi Preprocessing
+# Preprocessing
 def text_preprocessing(text):
     # sign end of sentences
     text = text.replace('.', '.<eos>')
@@ -22,7 +22,7 @@ def text_preprocessing(text):
     # clean text (lowercase, remove hashtag, non-alfanumeric, mention, url, etc.)
     def clean_text(text):
         text = re.sub(r'#\w+', '', text)
-        text = re.sub(r"[^\w\s]", '', text)
+        text = re.sub(r"[^\w\s?!]", '', text)
         text = re.sub(r'https?://\S+', '', text)
         text = re.sub(r'@[A-Za-z0-9_]+', '', text)
         text = text.lower()
@@ -38,7 +38,10 @@ processed_text = text_preprocessing(input_text)
 summarizer = pipeline('summarization', model='facebook/bart-large-cnn')
 if st.button('Summarize'):
     with st.spinner('Generating Summary.....'):
-        summarized_text = summarizer(processed_text, max_length=200, min_length=50, do_sample=False)
+        summarized_text = summarizer(processed_text,
+                                    max_length=150,
+                                    min_length=50,
+                                    do_sample=False)
         summarized_text = summarized_text[0]['summary_text']
     st.success('Text has been summarized')
     st.text_area("Summarized Text:", summarized_text, height=250)
